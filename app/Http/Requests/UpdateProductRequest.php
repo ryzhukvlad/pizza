@@ -24,9 +24,9 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|unique:products|max:255',
-            'type' => ['required', Rule::enum(ProductType::class)],
-            'price' => 'required|numeric|min:0',
+            'title' => 'sometimes|required|unique:products|max:255',
+            'type' => ['sometimes', 'required', Rule::enum(ProductType::class)],
+            'price' => 'sometimes|required|numeric|min:0',
         ];
     }
 }
