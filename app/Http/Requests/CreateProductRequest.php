@@ -25,8 +25,10 @@ class CreateProductRequest extends FormRequest
     {
         return [
             'title' => 'required|unique:products|max:255',
+            'description' => 'nullable|string',
             'type' => ['required', Rule::enum(ProductType::class)],
             'price' => 'required|numeric|min:0',
+            'image' => 'required|image',
         ];
     }
 }

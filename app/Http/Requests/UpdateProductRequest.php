@@ -25,8 +25,10 @@ class UpdateProductRequest extends FormRequest
     {
         return [
             'title' => 'sometimes|required|unique:products|max:255',
+            'description' => 'sometimes|nullable|string',
             'type' => ['sometimes', 'required', Rule::enum(ProductType::class)],
             'price' => 'sometimes|required|numeric|min:0',
+            'image' => 'sometimes|required|image',
         ];
     }
 }

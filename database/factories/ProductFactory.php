@@ -21,8 +21,10 @@ class ProductFactory extends Factory
         $types = array_column(ProductType::cases(), 'value');
         return [
             'title' => $this->faker->unique()->word(),
+            'description' => $this->faker->text(),
             'type' => $this->faker->randomElement($types),
             'price' => $this->faker->randomFloat(2, 400, 1000),
+            'image' => $this->faker->imageUrl(),
         ];
     }
 }
