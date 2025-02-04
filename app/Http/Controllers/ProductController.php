@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
@@ -24,8 +24,10 @@ class ProductController extends Controller
      */
     public function store(CreateProductRequest $request)
     {
+        $product = $request->validated();
+        $product['image'] = $request->file('image')->store('images', 'public');
         return [
-            'product' => Product::create($request->validated()),
+            'product' => Product::create($product),
         ];
     }
 
@@ -34,7 +36,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return compact('product');
+        return new ProductResource($product);
     }
 
     /**
