@@ -6,6 +6,7 @@ use App\Http\Requests\CreateProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -14,9 +15,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return [
-            'products' => Product::all()
-        ];
+        return ProductResource::collection(Product::all());
     }
 
     /**
@@ -25,10 +24,8 @@ class ProductController extends Controller
     public function store(CreateProductRequest $request)
     {
         $product = $request->validated();
-        $product['image'] = $request->file('image')->store('images', 'public');
-        return [
-            'product' => Product::create($product),
-        ];
+        $product['image'] = $request->file('image')->storeAs('images', $product['title'], 'public');
+        return new ProductResource(Product::create($product));
     }
 
     /**
@@ -45,7 +42,7 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
         $product->update($request->validated());
-        return compact('product');
+        return new ProductResource($product);
     }
 
     /**
@@ -53,7 +50,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        Storage::disk('public')->delete($product['image']);
         $product->delete();
-        return compact('product');
+        return ['Product deleted'];
     }
 }
