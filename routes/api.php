@@ -13,10 +13,12 @@ Route::prefix('v1')->group(function () {
         );
     });
 
+    Route::post('user/login', [UserController::class, 'login'])->middleware('guest:sanctum');
     Route::prefix('user')->group(function () {
-        Route::get('current', [UserController::class, 'current'])->middleware('auth:sanctum');
-        Route::post('login', [UserController::class, 'login']);
-    });
+        Route::get('logout', [UserController::class, 'logout']);
+        Route::get('current', [UserController::class, 'current']);
+
+    })->middleware('auth:sanctum');
 
     Route::prefix('admin')->group(function () {
         Route::resource('products', ProductController::class)->only([

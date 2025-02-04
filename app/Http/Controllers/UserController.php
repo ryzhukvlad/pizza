@@ -8,11 +8,6 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    public function current(Request $request)
-    {
-        return $request->user();
-    }
-
     public function login(UserAuthRequest $request)
     {
         if (Auth::once($request->validated())) {
@@ -21,5 +16,16 @@ class UserController extends Controller
         }
 
         return response(['error' => 'The provided credentials do not match our records.'], 401);
+    }
+
+    public function logout()
+    {
+        auth('sanctum')->user()->currentAccessToken()->delete();
+        return ['Token deleted successfully.'];
+    }
+
+    public function current()
+    {
+        return auth('sanctum')->user();
     }
 }
