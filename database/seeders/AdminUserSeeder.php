@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enum\UserRole;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class AdminUserSeeder extends Seeder
@@ -16,7 +16,7 @@ class AdminUserSeeder extends Seeder
         User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
-            'role' => 'admin',
+            'role' => UserRole::ADMIN,
         ]);
     }
 }

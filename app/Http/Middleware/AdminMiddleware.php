@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enum\UserRole;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,7 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth('sanctum')->user()?->role !== 'admin') {
+        if (auth('sanctum')->user()?->role !== UserRole::ADMIN) {
             return response(status: 403);
         }
         return $next($request);

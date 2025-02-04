@@ -18,10 +18,10 @@ class OrderFactory extends Factory
      */
     public function definition(): array
     {
-        $statuses = array_column(OrderStatus::cases(), 'name');
+        $statuses = array_column(OrderStatus::cases(), 'value');
         return [
             'user_id' => User::all()->random()->id,
-            'phone' => $this->faker->phoneNumber(),
+            'phone' => $this->faker->e164PhoneNumber(),
             'email' => $this->faker->safeEmail(),
             'address' => $this->faker->address(),
             'time' => $this->faker->dateTimeBetween('now', '+1 month'),
