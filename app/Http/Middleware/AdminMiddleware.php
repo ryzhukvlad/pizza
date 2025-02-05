@@ -16,7 +16,7 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth('sanctum')->user()?->role !== UserRole::ADMIN) {
+        if (auth('sanctum')->user()?->role !== UserRole::ADMIN->value) {
             return response(status: 403);
         }
         return $next($request);

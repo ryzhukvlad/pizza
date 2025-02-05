@@ -6,9 +6,8 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -17,7 +16,6 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        Gate::authorize('index', Product::class);
         return ['products' => ProductResource::collection(Product::all())];
     }
 
@@ -26,7 +24,6 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        Gate::authorize('store', Product::class);
         $product = $request->validated();
         $product['image'] = $request->file('image')->storeAs('images', $product['title'], 'public');
         return new ProductResource(Product::create($product));
@@ -37,7 +34,6 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        Gate::authorize('show', Product::class);
         return new ProductResource($product);
     }
 
@@ -46,7 +42,6 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        Gate::authorize('update', Product::class);
         $product->update($request->validated());
         return new ProductResource($product);
     }
@@ -56,7 +51,6 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        Gate::authorize('destroy', Product::class);
         Storage::disk('public')->delete($product['image']);
         $product->delete();
         return ['Product deleted'];
