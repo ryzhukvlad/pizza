@@ -2,10 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Enum\CartLimit;
-use App\Rules\CartProductLimit;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class CartUserRequest extends FormRequest
 {
@@ -27,7 +24,7 @@ class CartUserRequest extends FormRequest
         return [
             'products.*.id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1|max:20',
-            'products' => ['required', 'array', new CartProductLimit],
+            'products' => ['required', 'array'],
         ];
     }
 }

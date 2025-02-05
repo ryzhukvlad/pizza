@@ -22,14 +22,12 @@ Route::prefix('v1')->group(function () {
     Route::name('user.')->prefix('user')->group(function () {
         Route::get('logout', [UserController::class, 'logout'])->name('logout');
         Route::get('current', [UserController::class, 'current'])->name('current');
-        Route::get('cart', [UserController::class, 'cart'])->name('cart');
+        Route::post('cart', [UserController::class, 'cart'])->name('cart');
 
-        Route::prefix('orders')->group(function () {
-            Route::get('history', [OrderController::class, 'history']);
-            Route::resource('', OrderController::class)->only([
-                'show', 'store'
-            ]);
-        });
+        Route::get('orders/history', [OrderController::class, 'history'])->name('orders.history');
+        Route::resource('orders', OrderController::class)->only([
+            'show', 'store'
+        ]);
     })->middleware('auth:sanctum');
 
     Route::middleware(AdminMiddleware::class)->name('admin.')->prefix('admin')->group(function () {

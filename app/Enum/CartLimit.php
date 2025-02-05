@@ -10,8 +10,8 @@ enum CartLimit: int
     public static function typeLimit(string $type): int
     {
         return match ($type) {
-            ProductType::PIZZA->name => self::PIZZA_LIMIT->value,
-            ProductType::DRINK->name => self::DRINK_LIMIT->value,
+            ProductType::PIZZA->value => self::PIZZA_LIMIT->value,
+            ProductType::DRINK->value => self::DRINK_LIMIT->value,
         };
     }
 }

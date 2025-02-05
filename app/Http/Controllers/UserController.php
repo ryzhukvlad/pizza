@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\CartLimit;
 use App\Http\Requests\CartUserRequest;
 use App\Http\Requests\UserAuthRequest;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -35,10 +37,25 @@ class UserController extends Controller
         $cart = $request->validated();
         $user = auth('sanctum')->user();
 
-        $products = array_column($cart['products'], 'quantity', 'id');
-        array_walk($products, function (&$product) {
-            $product = ['quantity' => $product];
-        });
-        $user->products()->sync($products);
+        $ids = array_column($cart['products'], 'id');
+        $quantity = array_column($cart['products'], 'quantity', 'id');
+
+        $products = Product::whereIn('id', $ids)->get();
+        $cartTypeCount = [];
+        $userProducts = [];
+        foreach ($products as $key => $product) {
+            $cartTypeCount[$product->type] += $quantity[$product->id];
+            $userProducts[$product->id] = ['quantity' => $product->quantity];
+        }
+
+        foreach ($cartTypeCount as $type => $typeQuantity) {
+            if ($typeQuantity > CartLimit::typeLimit($type)) {
+                return response(['error' => "The quantity of $type product is too many."], 422);
+            }
+        }
+
+        $user->products()->sync($userProducts);
+
+        return ['Products added to cart successfully.'];
     }
 }
