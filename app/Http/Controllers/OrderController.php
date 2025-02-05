@@ -16,15 +16,20 @@ class OrderController extends Controller
         return ['orders' => OrderResource::collection(Order::all())];
     }
 
+    public function history(Request $request)
+    {
+        Gate::authorize('history', Order::class);
+        return ['orders' => OrderResource::collection(auth('sanctum')->user()->orders)];
+    }
+
     public function store(StoreOrderRequest $request)
     {
-        Gate::authorize('store');
+        Gate::authorize('store', Order::class);
         $order = $request->validated();
-        $products = $order['products'];
-        unset($order['products']);
+        $user = auth('sanctum')->user();
 
         $order = Order::create($order);
-        $order->products()->attach($products);
+        $order->products()->attach($user->products);
         return new OrderResource($order);
     }
 

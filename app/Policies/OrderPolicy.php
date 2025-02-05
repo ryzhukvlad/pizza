@@ -13,6 +13,11 @@ class OrderPolicy
         return $user->role === UserRole::ADMIN;
     }
 
+    public function history(User $user): bool
+    {
+        return auth('sanctum')->check();
+    }
+
     public function store(User $user): bool
     {
         return auth('sanctum')->check();

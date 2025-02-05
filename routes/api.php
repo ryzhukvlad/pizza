@@ -20,6 +20,7 @@ Route::prefix('v1')->group(function () {
         Route::get('current', [UserController::class, 'current']);
         Route::get('cart', [UserController::class, 'cart']);
         Route::resource('orders', OrderController::class)->only(['show', 'store']);
+        Route::get('orders/history', [OrderController::class, 'history']);
     })->middleware('auth:sanctum');
 
     Route::prefix('admin')->group(function () {
