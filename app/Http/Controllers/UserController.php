@@ -5,12 +5,22 @@ namespace App\Http\Controllers;
 use App\Enum\CartLimit;
 use App\Http\Requests\CartUserRequest;
 use App\Http\Requests\UserAuthRequest;
+use App\Http\Requests\UserRegisterRequest;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function register(UserRegisterRequest $request)
+    {
+        $user = $request->validated();
+        $user['password'] = Hash::make($user['password']);
+        return User::create($user)->createToken($user['email'])->plainTextToken;
+    }
+
     public function login(UserAuthRequest $request)
     {
         if (Auth::once($request->validated())) {
