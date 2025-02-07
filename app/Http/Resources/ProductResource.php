@@ -22,7 +22,8 @@ class ProductResource extends JsonResource
             'description' => $this->description,
             'type' => $this->type,
             'price' => $this->price,
-            'image' => asset("storage/$this->image")
+            'image' => asset("storage/$this->image"),
+            'quantity' => $this->when(!empty($this->pivot->quantity), $this->pivot->quantity ?? '')
         ];
     }
 }

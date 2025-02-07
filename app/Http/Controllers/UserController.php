@@ -6,6 +6,7 @@ use App\Enum\CartLimit;
 use App\Http\Requests\CartUserRequest;
 use App\Http\Requests\UserAuthRequest;
 use App\Http\Requests\UserRegisterRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -37,12 +38,12 @@ class UserController extends Controller
         return ['Token deleted successfully.'];
     }
 
-    public function current(Request $request)
+    public function profile(Request $request)
     {
         return auth('sanctum')->user();
     }
 
-    public function cart(CartUserRequest $request)
+    public function storeCart(CartUserRequest $request)
     {
         $cart = $request->validated();
         $user = auth('sanctum')->user();
@@ -54,8 +55,11 @@ class UserController extends Controller
         $cartTypeCount = [];
         $userProducts = [];
         foreach ($products as $key => $product) {
+            if (empty($cartTypeCount[$product->type])) {
+                $cartTypeCount[$product->type] = 0;
+            }
             $cartTypeCount[$product->type] += $quantity[$product->id];
-            $userProducts[$product->id] = ['quantity' => $product->quantity];
+            $userProducts[$product->id] = ['quantity' => $quantity[$product->id]];
         }
 
         foreach ($cartTypeCount as $type => $typeQuantity) {
@@ -63,9 +67,15 @@ class UserController extends Controller
                 return response(['error' => "The quantity of $type product is too many."], 422);
             }
         }
-
         $user->products()->sync($userProducts);
 
         return ['Products added to cart successfully.'];
+    }
+
+    public function showCart(Request $request)
+    {
+        $user = auth('sanctum')->user();
+        $products = $user->products;
+        return ProductResource::collection($products);
     }
 }

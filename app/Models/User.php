@@ -51,7 +51,7 @@ class User extends Authenticatable
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'cart_products');
+        return $this->belongsToMany(Product::class, 'cart_products')->withPivot('quantity');
     }
 
     public function orders(): BelongsToMany
