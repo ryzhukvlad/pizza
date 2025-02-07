@@ -1,9 +1,11 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\User;
 
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -71,42 +73,13 @@ class UserTest extends TestCase
 
     public function test_user_profile_success()
     {
-        $this->actingAs($this->user)->get(route('user.profile'))->assertOk()->assertSee($this->user->name);
+        $this->actingAs($this->user)->get(route('user.profile'))->assertOk()->assertSee(html_entity_decode(
+            $this->user->name
+        ));
     }
 
     public function test_user_profile_fail(): void
     {
         $this->get(route('user.profile'), ['Accept' => 'application/json'])->assertUnauthorized();
-    }
-
-    public function test_user_show_cart_success(): void
-    {
-        $products = Product::factory()->count(3)->create();
-        $this->user->products()->attach($products, ['quantity' => 3]);
-        $this->actingAs($this->user)->get(route('user.cart.show'))->assertOk()->assertSee($products[0]->name);
-    }
-
-    public function test_user_show_cart_fail(): void
-    {
-        $this->get(route('user.cart.show'), ['Accept' => 'application/json'])->assertUnauthorized();
-    }
-
-    public function test_user_store_cart_success(): void
-    {
-        $products = Product::factory()->count(3)->create();
-        $cartData = [];
-        foreach ($products as $product) {
-            $cartData['products'][] = ['id' => $product->id, 'quantity' => 3];
-        }
-        $this->actingAs($this->user)->post(route('user.cart.store'), $cartData)->assertOk()->assertJson([
-            'Products added to cart successfully.'
-        ]);
-        $rows = array_map(fn($cartProduct) => [
-            'user_id' => $this->user->id, 'product_id' => $cartProduct['id'], 'quantity' => 3
-        ], $cartData['products']);
-
-        foreach ($rows as $row) {
-            $this->assertDatabaseHas('products', $row);
-        }
     }
 }

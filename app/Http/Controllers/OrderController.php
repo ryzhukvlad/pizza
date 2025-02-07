@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enum\UserRole;
 use App\Http\Requests\StoreOrderRequest;
+use App\Http\Requests\UpdateOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -26,7 +27,9 @@ class OrderController extends Controller
         $user = auth('sanctum')->user();
 
         $order = Order::create($order);
-        $order->products()->attach($user->products);
+        foreach ($user->products as $product) {
+            $order->products()->attach($product->id, ['quantity' => $product->pivot->quantity]);
+        }
         return new OrderResource($order);
     }
 
@@ -39,7 +42,7 @@ class OrderController extends Controller
         return new OrderResource($order);
     }
 
-    public function update(Request $request, Order $order)
+    public function update(UpdateOrderRequest $request, Order $order)
     {
         $order->update($request->validated());
         return new OrderResource($order);

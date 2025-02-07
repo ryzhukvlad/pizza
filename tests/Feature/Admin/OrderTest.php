@@ -1,28 +1,24 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Admin;
 
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class OrderTest extends TestCase
 {
+    use RefreshDatabase;
     protected User $orderUser;
     protected Order $order;
-    protected Collection $products;
-
     protected function setUp(): void
     {
         parent::setUp();
         $this->orderUser = User::factory()->create();
-        $this->products = Product::factory()->count(3)->create();
         $this->order = Order::factory(['user_id' => $this->orderUser->id])->create();
-        $this->order->products()->sync($this->products);
+        $this->order->products()->attach(Product::factory()->count(3)->create(), ['quantity' => 3]);
     }
 
     public function test_order_index_success(): void
@@ -46,15 +42,27 @@ class OrderTest extends TestCase
         $this->actingAs($this->defaultUser)->get(route('admin.orders.show', [$this->order->id]))->assertForbidden();
     }
 
-    public function test_order_store_success(): void
+    public function test_order_update_success(): void
     {
-//        $products = [];
-//        foreach ($productIds as $productId) {
-//            $products[$productId] = ['quantity' => rand(1, 3)];
-//        }
-//        $this->actingAs($this->defaultUser)->post(
-//            route('admin.orders.store'),
-//            ['products' => array_co]
-//        );
+        $this->order->total++;
+        $this->actingAs($this->adminUser)->patch(
+            route('admin.orders.update', [$this->order->id]),
+            ['total' => $this->order->total]
+        )->assertOk();
+
+        $this->assertDatabaseHas('orders', $this->order->getAttributes());
+
+        $this->get(route('admin.orders.show', [$this->order->id]))->assertOk();
+    }
+
+    public function test_order_update_fail(): void
+    {
+        $this->order->total++;
+        $this->actingAs($this->defaultUser)->patch(
+            route('admin.orders.update', [$this->order->id]),
+            ['total' => $this->order->total]
+        )->assertForbidden();
+
+        $this->assertDatabaseMissing('orders', $this->order->getAttributes());
     }
 }

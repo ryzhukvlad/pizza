@@ -6,7 +6,7 @@ use App\Enum\OrderStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreOrderRequest extends FormRequest
+class UpdateOrderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +24,13 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|exists:users,id',
-            'phone' => 'required|string',
-            'email' => 'required|string',
-            'address' => 'required|string',
-            'time' => 'required|date',
-            'total' => 'required|numeric',
-            'status' => ['required', Rule::enum(OrderStatus::class)],
+            'user_id' => 'sometimes|required|exists:users,id',
+            'phone' => 'sometimes|required|string',
+            'email' => 'sometimes|required|string',
+            'address' => 'sometimes|required|string',
+            'time' => 'sometimes|required|date',
+            'total' => 'sometimes|required|numeric',
+            'status' => ['sometimes|required', Rule::enum(OrderStatus::class)],
         ];
     }
 }

@@ -4,8 +4,8 @@ namespace App\Enum;
 
 enum CartLimit: int
 {
-    case PIZZA_LIMIT = 5;
-    case DRINK_LIMIT = 10;
+    case PIZZA_LIMIT = 10;
+    case DRINK_LIMIT = 20;
 
     public static function typeLimit(string $type): int
     {

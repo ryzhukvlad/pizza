@@ -1,52 +1,57 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Admin;
 
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ProductTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
+    use RefreshDatabase;
 
+    protected Collection $products;
     protected Product $product;
-    protected array $productAttributes;
-    protected string $table;
 
     protected function setUp(): void
     {
         parent::setUp();
         Storage::fake('public');
         $image = UploadedFile::fake()->image('test-image.jpg');
-
-        $this->product = Product::factory()->create();
+        $this->products = Product::factory()->count(3)->create();
+        $this->product = $this->products->first();
         $this->productAttributes = Product::factory()->make(['image' => $image])->getAttributes();
-        $this->table = $this->product->getTable();
     }
 
     public function test_products_index_success(): void
     {
-        $this->get(route('public.products.index'))->assertOk();
+        $response = $this->actingAs($this->adminUser)->get(route('admin.products.index'))->assertOk();
+        foreach ($this->products as $product) {
+            $response->assertSee($product->title);
+        }
     }
 
     public function test_products_index_fail(): void
     {
-        $this->post(route('public.products.index'))->assertMethodNotAllowed();
+        $this->actingAs($this->defaultUser)->post(route('admin.products.index'))->assertForbidden();
     }
 
     public function test_products_show_success(): void
     {
-        $this->get(route('public.products.show', [$this->product->id]))->assertOk();
+        $this->actingAs($this->adminUser)->get(
+            route('admin.products.show', [$this->product->id])
+        )->assertOk()->assertSee($this->product->title);
     }
 
     public function test_products_show_fail(): void
     {
-        $this->get(route('public.products.show', [1]))->assertNotFound();
+        $this->actingAs($this->defaultUser)->get(
+            route('admin.products.show', [$this->product->id])
+        )->assertForbidden();
     }
 
     public function test_products_store_success(): void
@@ -58,7 +63,7 @@ class ProductTest extends TestCase
         )->assertCreated();
 
         unset($this->productAttributes['image']);
-        $this->assertDatabaseHas($this->table, $this->productAttributes);
+        $this->assertDatabaseHas('products', $this->productAttributes);
 
         $this->get(route('public.products.index'))->assertJsonFragment($this->productAttributes);
     }
@@ -70,7 +75,7 @@ class ProductTest extends TestCase
             $this->productAttributes
         )->assertForbidden();
 
-        $this->assertDatabaseMissing($this->table, $this->productAttributes);
+        $this->assertDatabaseMissing('products', $this->productAttributes);
 
         $this->get(route('public.products.index'))->assertDontSee($this->productAttributes['description']);
     }
@@ -83,7 +88,7 @@ class ProductTest extends TestCase
             ['price' => $this->product->price]
         )->assertOk();
 
-        $this->assertDatabaseHas($this->table, $this->product->getAttributes());
+        $this->assertDatabaseHas('products', $this->product->getAttributes());
 
         $this->get(route('admin.products.show', [$this->product->id]))->assertOk();
     }
@@ -96,8 +101,24 @@ class ProductTest extends TestCase
             ['price' => $this->product->price]
         )->assertForbidden();
 
-        $this->assertDatabaseMissing($this->table, $this->product->getAttributes());
+        $this->assertDatabaseMissing('products', $this->product->getAttributes());
 
         $this->get(route('public.products.show', [$this->product->id]))->assertDontSee($this->product->price);
+    }
+
+    public function test_products_destroy_success(): void
+    {
+        $this->actingAs($this->adminUser)->delete(
+            route('admin.products.destroy', [$this->product->id])
+        )->assertOk();
+        $this->assertSoftDeleted('products', $this->product->getAttributes());
+    }
+
+    public function test_products_destroy_fail(): void
+    {
+        $this->actingAs($this->defaultUser)->delete(
+            route('admin.products.destroy', [$this->product->id])
+        )->assertForbidden();
+        $this->assertDatabaseHas('products', $this->product->getAttributes());
     }
 }

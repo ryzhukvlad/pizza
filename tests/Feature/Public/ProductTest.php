@@ -1,12 +1,15 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Public;
 
 use App\Models\Product;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class PublicTest extends TestCase
+class ProductTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected Product $product;
 
     protected function setUp(): void
