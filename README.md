@@ -45,7 +45,7 @@ sail up -d
 
 7. Запустите миграции и сидеры:
 ```bash
-sail art migrate --seed
+sail art migrate:fresh --seed
 ``` 
 8. Запустите тесты:
 ```bash
