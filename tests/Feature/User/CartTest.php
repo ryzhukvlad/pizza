@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\User;
 
-use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;

@@ -30,7 +30,7 @@ class UpdateOrderRequest extends FormRequest
             'address' => 'sometimes|required|string',
             'time' => 'sometimes|required|date',
             'total' => 'sometimes|required|numeric',
-            'status' => ['sometimes|required', Rule::enum(OrderStatus::class)],
+            'status' => ['sometimes', 'required', Rule::enum(OrderStatus::class)],
         ];
     }
 }

@@ -2,10 +2,7 @@
 
 namespace Tests\Feature\User;
 
-use App\Models\Order;
-use App\Models\Product;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -33,7 +30,7 @@ class UserTest extends TestCase
     public function test_user_register_fail(): void
     {
         unset($this->registerUserData['email']);
-        $this->post(route('user.register'), $this->registerUserData)->assertFound();
+        $this->post(route('user.register'), $this->registerUserData)->assertUnprocessable();
     }
 
     public function test_user_login_success(): void
@@ -44,7 +41,7 @@ class UserTest extends TestCase
     public function test_user_login_fail(): void
     {
         unset($this->loginUserData['password']);
-        $this->post(route('user.login'), $this->loginUserData)->assertFound();
+        $this->post(route('user.login'), $this->loginUserData)->assertUnprocessable();
     }
 
     public function test_user_logout_success(): void

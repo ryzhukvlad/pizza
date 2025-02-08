@@ -18,7 +18,7 @@ class OrderController extends Controller
 
     public function history(Request $request)
     {
-        return ['orders' => OrderResource::collection(auth('sanctum')->user()->orders)];
+        return response()->json(['orders' => OrderResource::collection(auth('sanctum')->user()->orders)]);
     }
 
     public function store(StoreOrderRequest $request)

@@ -53,6 +53,6 @@ class ProductController extends Controller
     {
         Storage::disk('public')->delete($product['image']);
         $product->delete();
-        return ['Product deleted'];
+        return response()->json(['Product deleted']);
     }
 }
